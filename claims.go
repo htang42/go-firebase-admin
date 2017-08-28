@@ -21,15 +21,15 @@ type Claims struct {
 // But not verify token signature and header
 func (c *Claims) Valid() error {
 	now := time.Now().Unix()
-
-	if !c.verifyExpiresAt(now) {
-		delta := time.Unix(now, 0).Sub(time.Unix(c.ExpiresAt, 0))
+	leeway := int64(time.Minute * 5)
+	if !c.verifyExpiresAt(now - leeway) {
+		delta := time.Unix(now-leeway, 0).Sub(time.Unix(c.ExpiresAt, 0))
 		return fmt.Errorf("token is expired by %v", delta)
 	}
 
-	if !c.verifyIssuedAt(now) {
-		return fmt.Errorf("token used before issued")
-	}
+	// if !c.verifyIssuedAt(now) {
+	// 	return fmt.Errorf("token used before issued")
+	// }
 
 	return nil
 }
